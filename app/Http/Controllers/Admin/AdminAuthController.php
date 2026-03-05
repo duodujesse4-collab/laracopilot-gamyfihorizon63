@@ -23,9 +23,9 @@ class AdminAuthController extends Controller
         ]);
 
         $credentials = [
-            'admin@shopify.com' => ['password' => 'admin123', 'role' => 'Super Admin', 'name' => 'Admin'],
-            'manager@shopify.com' => ['password' => 'manager123', 'role' => 'Store Manager', 'name' => 'Manager'],
-            'inventory@shopify.com' => ['password' => 'inventory123', 'role' => 'Inventory Manager', 'name' => 'Inventory']
+            'admin@shopify.com' => ['password' => 'admin123', 'name' => 'Admin', 'role' => 'Super Admin'],
+            'manager@shopify.com' => ['password' => 'manager123', 'name' => 'Manager', 'role' => 'Store Manager'],
+            'inventory@shopify.com' => ['password' => 'inventory123', 'name' => 'Inventory', 'role' => 'Inventory Manager'],
         ];
 
         if (isset($credentials[$request->email]) &&
@@ -34,12 +34,12 @@ class AdminAuthController extends Controller
                 'admin_logged_in' => true,
                 'admin_user' => $credentials[$request->email]['name'],
                 'admin_email' => $request->email,
-                'admin_role' => $credentials[$request->email]['role']
+                'admin_role' => $credentials[$request->email]['role'],
             ]);
             return redirect()->route('admin.dashboard');
         }
 
-        return back()->withErrors(['email' => 'Invalid credentials. Please check the demo credentials below.'])->withInput();
+        return back()->withErrors(['email' => 'Invalid credentials. Please check the test accounts below.']);
     }
 
     public function logout()

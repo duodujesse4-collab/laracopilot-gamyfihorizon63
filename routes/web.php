@@ -2,45 +2,48 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminAuthController;
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\InventoryController;
-use App\Http\Controllers\Shop\ShopController;
-use App\Http\Controllers\Shop\CartController;
-use App\Http\Controllers\Shop\CheckoutController;
-use App\Http\Controllers\Shop\AccountController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\ShopController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AccountController;
 
-// Public routes
+// Public
 Route::get('/', [ShopController::class, 'home'])->name('home');
-Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
-Route::get('/shop/product/{id}', [ShopController::class, 'show'])->name('shop.product');
-Route::get('/shop/category/{id}', [ShopController::class, 'category'])->name('shop.category');
-Route::get('/shop/search', [ShopController::class, 'search'])->name('shop.search');
+Route::get('/shop', [ShopController::class, 'index'])->name('shop');
+Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
+Route::get('/category/{slug}', [ShopController::class, 'category'])->name('shop.category');
 
-// Customer Auth
-Route::get('/login', [AccountController::class, 'showLogin'])->name('login');
-Route::post('/login', [AccountController::class, 'login']);
-Route::get('/register', [AccountController::class, 'showRegister'])->name('register');
-Route::post('/register', [AccountController::class, 'register']);
-Route::post('/logout', [AccountController::class, 'logout'])->name('logout');
-Route::get('/account', [AccountController::class, 'dashboard'])->name('account.dashboard');
+// Auth
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Account
+Route::get('/account', [AccountController::class, 'index'])->name('account');
 Route::get('/account/orders', [AccountController::class, 'orders'])->name('account.orders');
-Route::get('/account/orders/{id}', [AccountController::class, 'orderDetail'])->name('account.order.detail');
+Route::get('/account/orders/{id}', [AccountController::class, 'orderDetail'])->name('account.orders.show');
+Route::get('/account/profile', [AccountController::class, 'profile'])->name('account.profile');
+Route::put('/account/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
 
 // Cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-Route::put('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+Route::put('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 // Checkout
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
-Route::get('/checkout/success/{orderId}', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 
 // Admin Auth
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -48,34 +51,30 @@ Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
 // Admin Dashboard
-Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
 // Admin Products
-Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
-Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
-Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
-Route::get('/admin/products/{id}', [ProductController::class, 'show'])->name('admin.products.show');
-Route::get('/admin/products/{id}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
-Route::put('/admin/products/{id}', [ProductController::class, 'update'])->name('admin.products.update');
-Route::delete('/admin/products/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+Route::get('/admin/products', [AdminProductController::class, 'index'])->name('admin.products.index');
+Route::get('/admin/products/create', [AdminProductController::class, 'create'])->name('admin.products.create');
+Route::post('/admin/products', [AdminProductController::class, 'store'])->name('admin.products.store');
+Route::get('/admin/products/{id}/edit', [AdminProductController::class, 'edit'])->name('admin.products.edit');
+Route::put('/admin/products/{id}', [AdminProductController::class, 'update'])->name('admin.products.update');
+Route::delete('/admin/products/{id}', [AdminProductController::class, 'destroy'])->name('admin.products.destroy');
 
 // Admin Categories
-Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
-Route::get('/admin/categories/create', [CategoryController::class, 'create'])->name('admin.categories.create');
-Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
-Route::get('/admin/categories/{id}/edit', [CategoryController::class, 'edit'])->name('admin.categories.edit');
-Route::put('/admin/categories/{id}', [CategoryController::class, 'update'])->name('admin.categories.update');
-Route::delete('/admin/categories/{id}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+Route::get('/admin/categories', [AdminCategoryController::class, 'index'])->name('admin.categories.index');
+Route::get('/admin/categories/create', [AdminCategoryController::class, 'create'])->name('admin.categories.create');
+Route::post('/admin/categories', [AdminCategoryController::class, 'store'])->name('admin.categories.store');
+Route::get('/admin/categories/{id}/edit', [AdminCategoryController::class, 'edit'])->name('admin.categories.edit');
+Route::put('/admin/categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
+Route::delete('/admin/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
 // Admin Orders
-Route::get('/admin/orders', [OrderController::class, 'index'])->name('admin.orders.index');
-Route::get('/admin/orders/{id}', [OrderController::class, 'show'])->name('admin.orders.show');
-Route::put('/admin/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.status');
+Route::get('/admin/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+Route::get('/admin/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+Route::put('/admin/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
-// Admin Customers
-Route::get('/admin/customers', [CustomerController::class, 'index'])->name('admin.customers.index');
-Route::get('/admin/customers/{id}', [CustomerController::class, 'show'])->name('admin.customers.show');
-
-// Admin Inventory
-Route::get('/admin/inventory', [InventoryController::class, 'index'])->name('admin.inventory.index');
-Route::put('/admin/inventory/{id}', [InventoryController::class, 'update'])->name('admin.inventory.update');
+// Admin Users
+Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+Route::get('/admin/users/{id}', [AdminUserController::class, 'show'])->name('admin.users.show');
+Route::delete('/admin/users/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
